@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: sam app to deploy lambda functions
+
+Globals:
+  Function:
+    Runtime: python3.6
+    Timeout: 30
+    Handler: app.lambda_handler
+    Environment:
+      Variables:
+        TABLE_NAME: users_keys
+
+Resources:
+  AWSConsoleAccessFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/aws_console_access
+  KeyRotationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/key_rotation
+
+
+Outputs:
+  AWSConsoleAccessFunctionArn:
+    Description: "AWSConsoleAccessFunction ARN"
+    Value: !GetAtt AWSConsoleAccessFunction.Arn
+  KeyRotationFunctionArn:
+    Description: "KeyRotationFunction ARN"
+    Value: !GetAtt KeyRotationFunction.Arn
+    
