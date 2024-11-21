@@ -29,10 +29,10 @@ def getEmailContent(is_warning: bool, key_data: dict) -> dict:
         body = 'Generate new access key as soon as possible'
     else:
         subject = 'Your AWS account new access key & secret key'
-        body = '<p> Old access key expired & New access key generated </p><br>' + \
-               '<p> AccessKey : ' + key_data["access_key"] + '</p><br>' + \
-               '<p> SecretKey : ' + key_data["secret_key"] + '</p><br>' + \
-               '<p> Update all applications with new Keys </p>'
+        body = f""" Old access key expired & New access key generated
+                   AccessKey : {key_data["access_key"]} 
+                   SecretKey : {key_data["secret_key"]}
+                   Update all applications with new Keys """
     mail_body = getMailBody(subject, body)
     return mail_body
 
@@ -40,7 +40,7 @@ def getEmailContent(is_warning: bool, key_data: dict) -> dict:
 def sendMail(receiver: str, key_data: dict, is_warning: bool):
     client = boto3.client('pinpoint', region_name=config.aws_region)
     content = getEmailContent(is_warning, key_data)
-    app_id = os.getenv('PINPOINT_APP_ID', 'dummy_ap_id')
+    app_id = os.getenv('PINPOINT_APP_ID', '62f4233bcae346d6b98bfd205d3b2e06')
     try:
         resp = client.send_messages(
             ApplicationId=app_id,
@@ -72,3 +72,5 @@ def mailerService(user_email: str, key_data: dict, is_warning: bool):
 
     if status == "Success":
         sendMail(user_email, key_data, is_warning)
+    else:
+        ses_identity.verifyEmailIdentity(user_email)

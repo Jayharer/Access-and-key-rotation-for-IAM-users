@@ -24,10 +24,9 @@ class KeyRotation:
 
     def getUserEmail(self, user_name: str) -> str:
         response_tag = self.client.get_user(UserName=user_name)
-        print("response_tag", response_tag)
         if 'Tags' in response_tag['User'].keys():
             for tag in response_tag['User']['Tags']:
-                if tag['Key'].lower() == 'owner':
+                if tag['Key'].lower() == 'email':
                     return tag['Value']
         return ""
 
@@ -69,7 +68,6 @@ class KeyRotation:
 
     def warningAndRotation(self, user_data: dict,
                            access_key: dict, table):
-        print("user_data", user_data)
         user_mail = user_data["user_mail"]
         user_name = user_data["user_name"]
         is_key_expiring_soon = access_key['key_duration'] >= 30
@@ -90,6 +88,7 @@ class KeyRotation:
                 # disable access keys for console disable user
                 self.disableAccessKey(user_name, access_key["keyid"])
         elif is_key_expiring_soon:
+            print(f'Key expiring soon for user:{user_mail}')
             mail.mailerService(user_mail, key_data=dict(), is_warning=True)
 
 
@@ -107,7 +106,6 @@ def lambda_handler(event, context):
         user_data["is_console_access"] = utils.checkConsoleAccess(iam_client, user_name)
         user_data["user_name"] = user_name
         for access_key in user_data["access_key_list"]:
-            print("access_key", access_key)
             key_rotation.warningAndRotation(user_data, access_key, table)
 
     return {
