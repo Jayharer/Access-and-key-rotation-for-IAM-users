@@ -74,15 +74,32 @@ Resources:
                   - dynamodb:PutItem
                   - dynamodb:DeleteItem
                 Resource: arn:aws:dynamodb:*:*:table/user
+        - PolicyName: LambdaIAMPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:GetLoginProfile
+                  - iam:ListAccessKeys
+                  - iam:ListUsers
+                  - iam:ListUserTags
+                  - iam:GetUser
+                  - iam:CreateAccessKey
+                  - iam:DeactivateMFADevice
+                  - iam:DeleteAccessKey
+                  - iam:DeleteLoginProfile
+                  - iam:UpdateLoginProfile
+                Resource: arn:aws:iam::*:*
   ConsoleAccessFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: console_access
+      CodeUri: console_access/
       Role: !GetAtt LambdaExecutionRole.Arn
   KeyRotationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: key_rotation
+      CodeUri: key_rotation/
       Role: !GetAtt LambdaExecutionRole.Arn
       Environment:
         Variables:

@@ -1,8 +1,11 @@
-import boto3
+import os
+import sys
 from datetime import date
 
+import boto3
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from . import mail
-from common import utils
 
 
 class KeyRotation:
@@ -29,6 +32,14 @@ class KeyRotation:
                 if tag['Key'].lower() == 'email':
                     return tag['Value']
         return ""
+
+    def checkConsoleAccess(self, user_name: str) -> bool:
+        # get login profile of user to identity console disable user
+        try:
+            resp = self.client.get_login_profile(UserName=user_name)
+            return True
+        except Exception as e:
+            return False
 
     def generateNewKey(self, user_name: str, table):
         new_key = self.client.create_access_key(UserName=user_name)
@@ -103,7 +114,7 @@ def lambda_handler(event, context):
         user_data = dict()
         user_data["access_key_list"] = key_rotation.getKeyData(user_name)
         user_data["user_mail"] = key_rotation.getUserEmail(user_name)
-        user_data["is_console_access"] = utils.checkConsoleAccess(iam_client, user_name)
+        user_data["is_console_access"] = key_rotation.checkConsoleAccess(user_name)
         user_data["user_name"] = user_name
         for access_key in user_data["access_key_list"]:
             key_rotation.warningAndRotation(user_data, access_key, table)

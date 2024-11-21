@@ -2,8 +2,10 @@ import boto3
 import os
 import traceback
 
-from common import config
 from . import ses_verify as ses
+
+aws_region = "us-east-1"
+sender_mail = 'jay416505@gmail.com'
 
 
 def getMailBody(subject: str, body_html: str) -> dict:
@@ -38,7 +40,7 @@ def getEmailContent(is_warning: bool, key_data: dict) -> dict:
 
 
 def sendMail(receiver: str, key_data: dict, is_warning: bool):
-    client = boto3.client('pinpoint', region_name=config.aws_region)
+    client = boto3.client('pinpoint', region_name=aws_region)
     content = getEmailContent(is_warning, key_data)
     app_id = os.getenv('PINPOINT_APP_ID', '62f4233bcae346d6b98bfd205d3b2e06')
     try:
@@ -52,7 +54,7 @@ def sendMail(receiver: str, key_data: dict, is_warning: bool):
                 },
                 'MessageConfiguration': {
                     'EmailMessage': {
-                        'FromAddress': config.sender_mail,
+                        'FromAddress': sender_mail,
                         'SimpleEmail': content,
                     }
                 }

@@ -1,7 +1,9 @@
-import boto3
+import boto3, os, sys
 from datetime import date
 
-from common import config
+aws_root_account_id = 861936062471
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 def disableConsoleLogin(client: boto3.client, user_name: str):
@@ -17,7 +19,7 @@ def disableMFA(client: boto3.client, user_name: str):
         resp2 = client.deactivate_mfa_device(
             UserName=user_name,
             SerialNumber='arn:aws:iam::{}:mfa/{}'.format(
-                config.aws_root_account_id, user_name)
+                aws_root_account_id, user_name)
         )
     except Exception as e:
         pass
