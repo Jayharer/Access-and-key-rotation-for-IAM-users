@@ -168,3 +168,5 @@ bin/*
 # Build folder
 */build/*
 .aws-sam/
+
+main.py

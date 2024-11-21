@@ -6,10 +6,10 @@ variable "AWS_REGION" {
 
 variable "lambda_key_rotation" {
   type    = string
-  default = "access_secret_key_rotation"
+  default = "sam-app-KeyRotationFunction-WUxxCiiagHhX"
 }
 
-variable "lambda_aws_console_access" {
+variable "lambda_console_access" {
   type    = string
-  default = "disable_console_login"
+  default = "sam-app-ConsoleAccessFunction-xNLiHLMIbhEG"
 }

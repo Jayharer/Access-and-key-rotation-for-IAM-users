@@ -4,29 +4,95 @@ Description: sam app to deploy lambda functions
 
 Globals:
   Function:
-    Runtime: python3.6
-    Timeout: 30
+    Runtime: python3.9
+    Timeout: 60
     Handler: app.lambda_handler
-    Environment:
-      Variables:
-        TABLE_NAME: users_keys
 
 Resources:
-  AWSConsoleAccessFunction:
+  DynamodbAccessKeysTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "accessKeys"
+      AttributeDefinitions:
+        - AttributeName: "user_name"
+          AttributeType: "S"
+        - AttributeName: "key_id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "user_name"
+          KeyType: "HASH" # Partition Key
+        - AttributeName: "key_id"
+          KeyType: "RANGE" # Sort Key
+      BillingMode: "PAY_PER_REQUEST" # On-demand pricing
+  PinpointApplication:
+    Type: AWS::Pinpoint::App
+    Properties:
+      Name: MyPinpointApp
+  EmailChannel:
+    Type: AWS::Pinpoint::EmailChannel
+    Properties:
+      ApplicationId: !Ref PinpointApplication
+      FromAddress: jay416505@gmail.com # Use a verified email address from ses
+      Identity: arn:aws:ses:us-east-1:861936062471:identity/jay416505@gmail.com
+      Enabled: true
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+        - PolicyName: LambdaPinpointPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - pinpoint:SendMessages
+                  - pinpoint:ListApps
+                Resource: arn:aws:pinpoint:*:*:*
+        - PolicyName: LambdaDynamodbPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                Resource: arn:aws:dynamodb:*:*:table/user
+  ConsoleAccessFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: src/aws_console_access
+      CodeUri: console_access
+      Role: !GetAtt LambdaExecutionRole.Arn
   KeyRotationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/key_rotation
-
+      CodeUri: key_rotation
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          PINPOINT_APP_ID: !Ref PinpointApplication
 
 Outputs:
-  AWSConsoleAccessFunctionArn:
-    Description: "AWSConsoleAccessFunction ARN"
-    Value: !GetAtt AWSConsoleAccessFunction.Arn
+  ConsoleAccessFunctionArn:
+    Value: !GetAtt ConsoleAccessFunction.Arn
   KeyRotationFunctionArn:
-    Description: "KeyRotationFunction ARN"
     Value: !GetAtt KeyRotationFunction.Arn
+  PinpointApplicationId:
+    Value: !Ref PinpointApplication
     

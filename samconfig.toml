@@ -1,4 +1,9 @@
 version = 0.1
+[default.package.parameters]
+stack_name = "sam-app"
+s3_bucket = "jayambar-terraform-backend"
+s3_prefix = "project01/sam-app"
+region = "us-east-1"
 [default.deploy.parameters]
 stack_name = "sam-app"
 s3_bucket = "jayambar-terraform-backend"
