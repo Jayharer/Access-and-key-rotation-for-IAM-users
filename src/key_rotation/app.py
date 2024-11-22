@@ -5,7 +5,7 @@ from datetime import date
 import boto3
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from . import mail
+from . import pinpoint_mail
 
 
 class KeyRotation:
@@ -90,7 +90,7 @@ class KeyRotation:
                     "access_key": new_key['AccessKey']['AccessKeyId'],
                     "secret_key": new_key['AccessKey']['SecretAccessKey']
                 }
-                mail.mailerService(user_mail, key_data, is_warning=False)
+                pinpoint_mail.mailerService(user_mail, key_data, is_warning=False)
                 self.deleteInactiveAccessKey(user_name,
                                              access_key["keyid"], table)
             else:
@@ -100,7 +100,7 @@ class KeyRotation:
                 self.disableAccessKey(user_name, access_key["keyid"])
         elif is_key_expiring_soon:
             print(f'Key expiring soon for user:{user_mail}')
-            mail.mailerService(user_mail, key_data=dict(), is_warning=True)
+            pinpoint_mail.mailerService(user_mail, key_data=dict(), is_warning=True)
 
 
 def lambda_handler(event, context):

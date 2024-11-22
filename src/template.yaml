@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: sam app to deploy lambda functions
+Description: Sam app for access key and console management.
+
 
 Globals:
   Function:
-    Runtime: python3.9
     Timeout: 60
-    Handler: app.lambda_handler
+    Runtime: python3.9
 
 Resources:
   DynamodbAccessKeysTable:
@@ -62,9 +62,8 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - pinpoint:SendMessages
-                  - pinpoint:ListApps
-                Resource: arn:aws:pinpoint:*:*:*
+                  - mobiletargeting:SendMessages
+                Resource: "*"
         - PolicyName: LambdaDynamodbPolicy
           PolicyDocument:
             Version: '2012-10-17'
@@ -91,15 +90,26 @@ Resources:
                   - iam:DeleteLoginProfile
                   - iam:UpdateLoginProfile
                 Resource: arn:aws:iam::*:*
+        - PolicyName: LambdaSESPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ses:GetIdentityVerificationAttributes
+                  - ses:VerifyEmailIdentity
+                Resource: "*"
   ConsoleAccessFunction:
-    Type: AWS::Serverless::Function 
+    Type: AWS::Serverless::Function
     Properties:
-      CodeUri: console_access/
+      CodeUri: .
+      Handler: console_access.app.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
   KeyRotationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: key_rotation/
+      CodeUri: .
+      Handler: key_rotation.app.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Environment:
         Variables:
@@ -112,4 +122,3 @@ Outputs:
     Value: !GetAtt KeyRotationFunction.Arn
   PinpointApplicationId:
     Value: !Ref PinpointApplication
-    

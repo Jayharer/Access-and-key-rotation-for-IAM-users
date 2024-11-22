@@ -35,7 +35,7 @@ def lambda_handler(event, context):
             password_last_used = (user['PasswordLastUsed']).date()
             today = date.today()
             day_difference = (today - password_last_used).days
-            if day_difference >= 30:
+            if day_difference >= 60:
                 disableConsoleLogin(iam_client, user_name)
                 disableMFA(iam_client, user_name)
                 print("login & mfa disable for user : {}".format(user_name))
