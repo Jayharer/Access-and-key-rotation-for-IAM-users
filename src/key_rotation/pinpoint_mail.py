@@ -60,7 +60,7 @@ def sendMail(receiver: str, key_data: dict, is_warning: bool):
                 }
             }
         )
-        print(f"Email sent for {receiver}!")
+        print(f"Email sent for {receiver}!", resp)
     except Exception as e:
         print(traceback.format_exc())
 

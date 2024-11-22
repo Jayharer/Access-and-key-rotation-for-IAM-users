@@ -63,6 +63,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - mobiletargeting:SendMessages
+                  - ses:SendEmail
                 Resource: "*"
         - PolicyName: LambdaDynamodbPolicy
           PolicyDocument:
