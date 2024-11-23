@@ -44,7 +44,7 @@ you have to manges there access as per compliance
 ---
 
 ### Architecture
-![alt text](https://drive.google.com/file/d/1r03kGazOE6aWp9fI1dtgg9z-lEdsiWvM/view?usp=drive_link)
+![alt text](img/IAMAccessAndKeyRotation.svg)
 
 ---
 
