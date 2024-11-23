@@ -3,7 +3,7 @@ resource "aws_cloudwatch_event_rule" "lambdaExecutionRule" {
   name = "lambdaExecutionRule"
   description = "rule that executes lambda function daily at 6pm"
   event_bus_name = "default"
-  schedule_expression = "cron(30 12 * * ? *)" # "rate(5 minutes)"
+  schedule_expression = "cron(30 12 * * ? *)" # "rate(5 minutes)" 
 }
 
 resource "aws_cloudwatch_event_target" "lambdaTarget" {

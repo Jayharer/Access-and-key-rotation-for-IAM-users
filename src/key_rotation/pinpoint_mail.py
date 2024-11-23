@@ -40,7 +40,7 @@ def getEmailContent(is_warning: bool, key_data: dict) -> dict:
 def sendMail(receiver: str, key_data: dict, is_warning: bool):
     client = boto3.client('pinpoint', region_name=config.aws_region)
     content = getEmailContent(is_warning, key_data)
-    app_id = os.getenv('PINPOINT_APP_ID', '62f4233bcae346d6b98bfd205d3b2e06')
+    app_id = os.getenv('PINPOINT_APP_ID')
     try:
         resp = client.send_messages(
             ApplicationId=app_id,
