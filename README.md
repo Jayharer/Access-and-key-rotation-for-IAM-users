@@ -41,10 +41,11 @@ you have to manges there access as per compliance
 6. EventBridge
 7. S3 Bucket
 7. CloudeWatch
+8. CloudFormation
 ---
 
 ### Architecture
-![alt text](img/IAMAccessAndKeyRotation.svg)
+![alt text](img/IAMAccessAndKeyRotation.drawio.png)
 
 ---
 
@@ -59,7 +60,13 @@ git clone https://github.com/Jayharer/Access-and-key-rotation-for-IAM-users.git
 
 ### 3. Install sam cli
 
-### 4. Manually create s3 bucket in aws
+### 4. Create s3 bucket in aws
+```bash 
+cd aws 
+sam build -t s3-bucket.yml
+sam deploy --stack-name s3-bucket-stack
+```
+
 Update **src/samconfig.toml** with
 ```
 s3_bucket = "your-s3-bucket-name"
@@ -90,6 +97,7 @@ terraform apply
 Delete all resources from AWS cloud
 ```bash
 aws cloudformation delete-stack --stack-name sam-app
+aws cloudformation delete-stack --stack-name s3-bucket-stack
 cd iac 
 terraform destroy
 ```
